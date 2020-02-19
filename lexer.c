@@ -98,19 +98,22 @@ tokenInfo* getnexttoken(FILE *fp){
 
 				case '*':
 				nextChar = getCharacter(fp);
+				int commentline = line_num;
 				temp -> lexeme[count++] = nextChar;
 				if (nextChar == '*'){
 					int starCount = 0;
-					while(1){
+					temp -> lexeme[count-1]='\0';
+					temp -> lexeme[count-2]='\0';
+					int i = 1;
+					while(i){
+						//printf("stuck %c %s\n",nextChar,temp -> lexeme);
 						nextChar = getCharacter(fp);
 						switch (nextChar){
 							case '*':
 							starCount++;
 							if (starCount == 2){
-								temp -> lexeme[count++] = '*';
-								temp -> lexeme[count++] = '*';
 								temp -> lineNum = line_num; // yaha kuch changes karna hai.......
-								return temp;
+								i = 0;
 							}
 							break;
 
@@ -120,6 +123,10 @@ tokenInfo* getnexttoken(FILE *fp){
 							break;
 
 							default:
+							if (nextChar == 26){
+								printf("Comment starting on line %u not finished.\n",commentline);
+								i=0;
+							}
 							starCount = 0;
 							break;
 						}
@@ -131,6 +138,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					temp -> lexeme[count-1] = '\0';
 					return temp;
 				}
+				break;
 
 				case '=':
 				nextChar = getCharacter(fp);
@@ -406,6 +414,7 @@ tokenInfo* getnexttoken(FILE *fp){
 			break;
 		}
 		if (nextChar==26){
+			temp -> lexeme[0] = (char)(26);
 			temp -> tokenName = "EOF";
 			temp -> lineNum = line_num;
 			return temp;
