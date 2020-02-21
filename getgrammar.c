@@ -88,11 +88,11 @@ char* getnextterm(FILE *fp){
         str[count] = '\0';
         char *ret = (char *)malloc(sizeof(char)*(count+1));
         int i = 0;
-        while(i < count+1){
+        while(i < count + 1){
           ret[i] = str[i];
           i++;
         }
-        ret[count+1] = '\0';
+        ret[count + 1] = '\0';
         return ret ;
       }
       case 26:
@@ -107,7 +107,7 @@ char* getnextterm(FILE *fp){
 
 void getnextrule(FILE *fp, unit* head){
   char next;
-	do {
+	do{
     char* nextterm = getnextterm(fp);
     if (nextterm != NULL){
       addunit(head, nextterm, isNT);
@@ -127,9 +127,9 @@ void initializearray(){
 
 void resizearray(){
   arraySize = arraySize + 10;
-  array = (unit**)realloc(array,arraySize*sizeof(unit));
+  array = (unit**)realloc(array, arraySize*sizeof(unit));
   for(int i = arraySize - 10; i < arraySize; i++){
-    array[i] = calloc(1,sizeof(unit));
+    array[i] = calloc(1, sizeof(unit));
   }
 }
 
@@ -146,5 +146,5 @@ int main(){
       next = getnextcharacter(fp);
       //showlist(array[index]);
       index++;
-  	} while( next != 26 && index < 104);
+  	} while( next != 26 );
 }
