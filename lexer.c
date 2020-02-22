@@ -1,6 +1,5 @@
 #include "lexer.h"
 #include "hasher.h"
-#include "string.h"
 
 #define MAX_BUFFER_SIZE 1024
 

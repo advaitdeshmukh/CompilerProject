@@ -1,20 +1,20 @@
 <program> -> <moduleDeclarations> <otherModules> <driverModule> <otherModules>
 <moduleDeclarations> -> <moduleDeclaration> <moduleDeclarations> 
-<moduleDeclarations> -> # 
+<moduleDeclarations> -> eps 
 <moduleDeclaration> -> DECLARE MODULE ID SEMICOL 
 <otherModules> -> <module> <otherModules> 
- <otherModules> -> # 
+ <otherModules> -> eps 
 <driverModule> -> DRIVERDEF DRIVER PROGRAM DRIVERENDDEF <moduleDef> 
 <moduleDef> -> START <statements> END 
 <module> -> DEF MODULE ID ENDDEF TAKES INPUT SQBO <input_plist> SQBC SEMICOL<ret> <moduleDef> 
 <ret> -> RETURNS SQBO <output_plist> SQBC SEMICOL 
-<ret> -> # 
+<ret> -> eps 
 <input_plist> -> ID COLON <dataType> <N1> 
 <N1> -> COMMA ID COLON <dataType> <N1> 
-<N1> -> # 
+<N1> -> eps 
 <output_plist> -> ID COLON <type> <N2> 
 <N2> -> COMMA ID COLON <type> <N2> 
-<N2> -> # 
+<N2> -> eps 
 <dataType> -> INTEGER 
 <dataType> -> REAL 
 <dataType> -> BOOLEAN 
@@ -23,7 +23,7 @@
 <type> -> REAL 
 <type> -> BOOLEAN 
 <statements> -> <statement> <statements> 
-<statements> -> # 
+<statements> -> eps 
 <statement> -> <ioStmt> 
 <statement> -> <simpleStmt> 
 <statement> -> <declareStmt> 
@@ -39,7 +39,7 @@
 <var> -> <var_id_num> 
 <var> -> <boolConstt 
 <whichId> -> SQBO <index> SQBC 
-<whichId> -> # 
+<whichId> -> eps 
 <simpleStmt> -> <assignmentStmt> 
 <simpleStmt> -> <moduleReuseStmt> 
 <assignmentStmt> -> ID <whichStmt> 
@@ -51,10 +51,10 @@
 <index> -> ID 
 <moduleReuseStmt> -> <optional> USE MODULE ID WITH PARAMETERS <idList> SEMICOL 
 <optional> -> SQBO <idList> SQBC ASSIGNOP 
-<optional> -> # 
+<optional> -> eps 
 <idList> -> ID <N3> 
 <N3> -> COMMA ID <N3> 
-<N3> -> # 
+<N3> -> eps 
 <U> -> <unary_op> <new_NT> 
 <new_NT> -> BO <arithmeticExpr> BC 
 <new_NT> -> <var_id_num> 
@@ -62,19 +62,19 @@
 <unary_op> -> MINUS 
 <arithmeticOrBooleanExpr> -> <AnyTerm> <N7> 
 <N7> -> <logicalOp> <AnyTerm> <N7> 
-<N7> -> # 
+<N7> -> eps 
 <AnyTerm> -> <arithmeticExpr> <N8> 
 <AnyTerm> -> <boolConstt> 
 <N8> -> <relationalOp> <arithmeticExpr> 
-<N8> -> # 
+<N8> -> eps 
 <expression> -> <arithmeticOrBooleanExpr> 
 <expression> -> <U> 
 <arithmeticExpr> -> <term> <N4> 
 <N4> -> <op1> <term> <N4> 
-<N4> -> # 
+<N4> -> eps 
 <term> -> <factor> <N5> 
 <N5> -> <op2> <factor> <N5> 
-<N5> -> # 
+<N5> -> eps 
 <factor> -> BO <arithmeticExpr> BC 
 <op1> -> PLUS 
 <op1> -> MINUS 
@@ -92,12 +92,12 @@
 <conditionalStmt> -> SWITCH BO ID BC START <caseStmts> <default> END 
 <caseStmts> -> CASE <value> COLON <statements> BREAK SEMICOL <N9> 
 <N9> -> CASE <value> COLON <statements> BREAK SEMICOL<N9> 
-<N9> -> # 
+<N9> -> eps 
 <value> -> NUM 
 <value> -> TRUE 
 <value> -> FALSE 
 <default> -> DEFAULT COLON <statements> BREAK SEMICOL 
-<default> -> # 
+<default> -> eps 
 <iterativeStmt> -> FOR BO ID IN <range> BC START <statements> END 
 <iterativeStmt> -> WHILE BO <arithmeticOrBooleanExpr> BC START <statements> END
 <range_arrays> -> <index> RANGEOP <index>

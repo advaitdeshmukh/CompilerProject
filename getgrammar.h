@@ -1,12 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #define MAX_BUFFER_SIZE 1024
 
 typedef struct unit {
     char* term;
     struct unit *next;
     int terminal;
+    int count;
 } unit;
 
 char buffer[MAX_BUFFER_SIZE]; // the input buffer
@@ -14,15 +14,16 @@ int bufferPosition; // indicates the current character to be read from the buffe
 int bufferSize = -1; // the number of characters stored in the buffer (-1 indicates first use)
 int isNT = 0;
 int arraySize = 50;
-unit** array;
+unit** grammararray;
 
 void showlist (unit *head){
     unit *ptr = head;
+    printf("nodes: %u\n",ptr->count);
     while(ptr -> next){
-        printf("%s %u \n", ptr -> term, ptr -> terminal);
+        printf("%s %u \n",ptr -> term, ptr -> terminal);
         ptr = ptr -> next;
     }
-    printf ("%s %u \n\n", ptr -> term, ptr -> terminal);
+    printf ("%s %u \n\n",ptr -> term, ptr -> terminal);
 }
 
 char getnextcharacter(FILE *fp){
@@ -51,7 +52,6 @@ void addunit(unit *head, char* value1, int is){
   new -> term = value1;
   new -> terminal = is;
   new -> next = NULL;
-  showlist(head);
   while (ptr -> next){
     ptr = ptr -> next;
   }
@@ -107,44 +107,48 @@ char* getnextterm(FILE *fp){
 
 void getnextrule(FILE *fp, unit* head){
   char next;
+  int counter = 0;
 	do{
     char* nextterm = getnextterm(fp);
     if (nextterm != NULL){
       addunit(head, nextterm, isNT);
+      counter++;
     }
     bufferPosition--;
     next = getnextcharacter(fp);
 	} while( next != '\n' && next != 26);
-  showlist(head);
+  head->count = counter;
 }
 
-void initializearray(){
-  array = (unit **)malloc(arraySize*sizeof(unit));
+unit** initializearray(unit** array){
+  array = (unit **)calloc(arraySize,sizeof(unit));
   for(int i = 0; i < arraySize; i++){
-    array[i] = malloc(sizeof(unit));
+    array[i] = calloc(1,sizeof(unit));
   }
+  return array;
 }
 
-void resizearray(){
+unit** resizearray(unit** array){
   arraySize = arraySize + 10;
   array = (unit**)realloc(array, arraySize*sizeof(unit));
   for(int i = arraySize - 10; i < arraySize; i++){
     array[i] = calloc(1, sizeof(unit));
   }
+  return array;
 }
 
-int main(){
-	  FILE* fp = fopen("grammar.txt", "r");
-    initializearray();
+void getgrammar(){
+	  FILE* fp = fopen("testcase.txt", "r");
+    grammararray=initializearray(grammararray);
     char next;
     int index = 0;
     do {
       if(index == arraySize){
-        resizearray();
+        grammararray=resizearray(grammararray);
       }
-      getnextrule(fp, array[index]);
+      getnextrule(fp, grammararray[index]);
       next = getnextcharacter(fp);
-      //showlist(array[index]);
+      //showlist(grammararray[index]);
       index++;
   	} while( next != 26 );
 }
