@@ -151,4 +151,9 @@ void getgrammar(){
       //showlist(grammararray[index]);
       index++;
   	} while( next != 26 );
+    int i = 0;
+    while(grammararray[i]->term != NULL){
+      i++;
+    }
+    arraySize = i;
 }

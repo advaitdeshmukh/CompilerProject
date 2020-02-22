@@ -52,7 +52,6 @@ void mergelist(unit* list1,unit* list2){//list1 added to list2
       return;
     }
     if(list1->term == NULL){
-      //printf("successful merge\n");
       return;
     }
     unit* str = list1;
@@ -114,47 +113,14 @@ unit* first(unit* input){
           mergelist(first(new2),new);
           new2 = new2->next;if(new2==NULL){break;}
         }
-        // if(new2!=NULL){
         mergelist(first(new2),new);
-        //   printf("%s merge successful\n",new->term);
-        //   showlist(new);
-        // }
-        // printf("j= %u first of %s\n",j,new2->term);
-        // mergelist(first(new2),new);
-        // if(strcmp(new2->term,"eps") == 0){
-        //   return NULL;
-        //   }
-        //   unit* list = first(new2);
-        //   if(list == NULL){
-        //     isEpsilon = 1;
-        //   }
         }
       }
     }
     return new;
   }
 
-// unit* mazak(unit* input){
-//     for(int j = 0; j < arraySize; j++){
-//       if(strcmp(grammararray[j] -> term,input -> term) == 0){
-//         unit* new2 = grammararray[j] -> next;
-//         int counter = grammararray[j]->count -1;
-//         printf("new2:\n");
-//         showlist(new2);
-//         printf("counter: %u\n",counter);
-//         for(int i=0;i<counter-1;i++){
-//           if(canbeEpsilon(new2))
-//           break;
-//           printf("hum hai %s epsi=%u\n",new2->term);
-//           new2 = new2->next;
-//         }
-//         printf("%s baharaagaya\n",new2->term);
-//       }
-//     }
-//   }
-
 unit* follow(unit* input){
-  //printf("arraySize: %u\n",arraySize)
   unit* new1= calloc(1,sizeof(unit));
   if(strcmp("program",input -> term) == 0){
     new1->term = "$";
@@ -162,7 +128,6 @@ unit* follow(unit* input){
   for(int j = 0; j < arraySize; j++){
     unit* new2 = grammararray[j] -> next;
     int counter = grammararray[j]->count -1;
-    //printf("counter:%u\n",counter);
       for(int i=0;i<counter;i++){
         if(strcmp(new2 -> term,input -> term) == 0){//found it
           printf("%s \n",new2->term);
@@ -174,28 +139,19 @@ unit* follow(unit* input){
 
           if(new->next == NULL){
             if(strcmp(input -> term,grammararray[j]->term) != 0){
-              //printf("follow of %s demanded\n",grammararray[j]->term);
-              //printf("1  input = %s grammar = %s\n",input->term,grammararray[j]->term);
               mergelist(follow(grammararray[j]),new1);
-
-
             }//otherwise let it go
           }else{
             new = new->next;
             if(strcmp(input -> term,new -> term) != 0){
-              //printf("first of %s demanded\n",new->term);
-              //printf("2  input = %s new %s\n",input->term,new->term);
               mergelist(first(new),new1);
 
               if(canbeEpsilon(new)){
                 if(new->next==NULL){
                   if(strcmp(input -> term,grammararray[j]->term) != 0){
-                    //printf("follow of %s demanded\n",grammararray[j]->term);
-                    //printf("1  input = %s grammar = %s\n",input->term,grammararray[j]->term);
                     mergelist(follow(grammararray[j]),new1);
                   }
                 }else{
-                  //printf("3  new= %s\n",new->term);
                   mergelist(follow(new),new1);
                 }
 
@@ -210,61 +166,37 @@ unit* follow(unit* input){
 }
 
 void createfirst(){
-  int i = 0;
-  while(grammararray[i]->term != NULL){
-    i++;
-  }
-  arraySize = i;
   firstarray = initializearray(firstarray);
   for(int j = 0; j < arraySize; j++){
     firstarray[j] -> term = grammararray[j] -> term;
     firstarray[j] -> terminal = grammararray[j] -> terminal;
     firstarray[j] -> next = NULL;
   }
-  printf("arraysize: %u\n",arraySize);
 
-  // unit* head = first(grammararray[4]);
-  // mergelist(head,firstarray[4]);
-  printf("__________________________________________");
-  // showlist(firstarray[4]);
-  // mergelist(head,firstarray[0]);
-  // showlist(firstarray[0]);
+  int i;
   for(i = 0; i<arraySize; i++){
     unit* head = first(grammararray[i]);
     mergelist(head,firstarray[i]);
-    showlist(firstarray[i]);
+  }
+}
+
+void createfollow(){
+  followarray = initializearray(followarray);
+  for(int j = 0; j < arraySize; j++){
+    followarray[j] -> term = grammararray[j] -> term;
+    followarray[j] -> terminal = grammararray[j] -> terminal;
+    followarray[j] -> next = NULL;
+  }
+
+  int i;
+  for(i = 0; i<arraySize; i++){
+    unit* head = first(grammararray[i]);
+    mergelist(head,followarray[i]);
   }
 }
 
 void main(){
   getgrammar();
-  int i = 0;
-  while(grammararray[i]->term != NULL){
-    i++;
-  }
-  arraySize = i;
-   unit* new = calloc(1,sizeof(unit));
-   new->term = "B";
-   new->terminal = 1;
-   createfirst();
-   //printf("%s can be epsilon %u",new->term,canbeEpsilon(new));
-
-  //mergelist();
-  // printf("\n\n\n\n\n\nshow bitch\n");
-
-  // unit* new1 = calloc(1,sizeof(unit));
-  // new1->term = "new_NT";
-  // new1->terminal = 1;
-  //
-  // unit* masala = first(new1);
-  // printf("\n_________________________\n");
-  // showlist(masala);
-  // printf("new1: ");
-  // showlist(new1);
-  // printf("\nnew: ");
-  // showlist(new);
-  //
-  // mergelist(new1,new);
-  // printf("merged ");
-  // showlist(new);
+  createfirst();
+  createfollow();
 }
