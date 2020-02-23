@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define MAX_BUFFER_SIZE 1024
+#include "lexer1.h"
 
 typedef struct unit {
-    char* term;
+    char* term;//ntot
     struct unit *next;
     int terminal;
     int count;
@@ -11,22 +11,21 @@ typedef struct unit {
 
 char buffer[MAX_BUFFER_SIZE]; // the input buffer
 int bufferPosition; // indicates the current character to be read from the buffer
-int bufferSize = -1; // the number of characters stored in the buffer (-1 indicates first use)
 int isNT = 0;
 int arraySize = 50;
 unit** grammararray;
 unit** firstarray;
 unit** followarray;
 
-int strcmp(const char *X, const char *Y){
-  while (*X) {
-    if (*X != *Y)
-    break;
-    X++;
-    Y++;
-  }
-	return *(const unsigned char*)X - *(const unsigned char*)Y;
-}
+// int strcmp(const char *X, const char *Y){
+//   while (*X) {
+//     if (*X != *Y)
+//     break;
+//     X++;
+//     Y++;
+//   }
+// 	return *(const unsigned char*)X - *(const unsigned char*)Y;
+// }
 
 void showfirstfollow (unit *head){
   unit *ptr = head;
@@ -58,12 +57,12 @@ void showgrammar(){
   char* prevterm="";
   printf("Grammar: \n\n");
   for(int i = 0; i<arraySize; i++){
-    if(strcmp(prevterm,followarray[i]->term)==0){
+    if(strcmp(prevterm,grammararray[i]->term)==0){
       continue;
     }
     printf("Definition ");
     showfirstfollow(grammararray[i]);
-    prevterm = followarray[i]->term;
+    prevterm = grammararray[i]->term;
   }
 }
 
@@ -71,12 +70,12 @@ void showfirst(){
   char* prevterm="";
   printf("List of First Set: \n\n");
   for(int i = 0; i<arraySize; i++){
-    if(strcmp(prevterm,followarray[i]->term)==0){
+    if(strcmp(prevterm,firstarray[i]->term)==0){
       continue;
     }
     printf("First ");
     showfirstfollow(firstarray[i]);
-    prevterm = followarray[i]->term;
+    prevterm = firstarray[i]->term;
   }
 }
 

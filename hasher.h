@@ -29,16 +29,16 @@ void addnode (node *head, char* value1, char *value2) {
     ptr -> next = new;
 }
 
-void showlist (node *head) {
-  node *ptr = head;
-
-  while (ptr -> next) {
-      printf("%s %s\n",ptr -> keyword, ptr -> token);
-      ptr = ptr -> next;
-  }
-
-  printf ("%s %s\n", ptr -> keyword, ptr -> token);
-}
+// void showlist (node *head) {
+//   node *ptr = head;
+//
+//   while (ptr -> next) {
+//       printf("%s %s\n",ptr -> keyword, ptr -> token);
+//       ptr = ptr -> next;
+//   }
+//
+//   printf ("%s %s\n", ptr -> keyword, ptr -> token);
+// }
 
 char* searchInHASH(char *str){
   int index = (int) str[0];
