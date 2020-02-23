@@ -17,13 +17,13 @@ int arraySize = 50;
 unit** grammararray;
 
 void showlist (unit *head){
+  printf("showlist of %s",head->term);
     unit *ptr = head;
-    printf("nodes: %u\n",ptr->count);
     while(ptr -> next){
-        printf("%s %u \n",ptr -> term, ptr -> terminal);
+        printf("term:%s\nterminal: %u \nnext: %s\ncount:%u\n\n",ptr -> term, ptr -> terminal,ptr ->next,ptr ->count);
         ptr = ptr -> next;
     }
-    printf ("%s %u \n\n",ptr -> term, ptr -> terminal);
+    printf("term:%s\nterminal: %u \nnext: %s\ncount:%u\n\n\n",ptr -> term, ptr -> terminal,ptr ->next,ptr ->count);
 }
 
 char getnextcharacter(FILE *fp){
@@ -47,7 +47,7 @@ void addunit(unit *head, char* value1, int is){
       head-> terminal = is;
       return;
   }
-  unit *new = malloc(sizeof(unit));
+  unit *new = calloc(1,sizeof(unit));
   unit *ptr = head;
   new -> term = value1;
   new -> terminal = is;
@@ -72,7 +72,7 @@ char* getnextterm(FILE *fp){
       case ' ':
       if (count){
         str[count] = '\0';
-        char *ret = (char *)malloc(sizeof(char)*(count+1));
+        char *ret = (char *)calloc(count+1,sizeof(char));
         int i = 0;
         while(i < count+1){
           ret[i] = str[i];
@@ -86,7 +86,7 @@ char* getnextterm(FILE *fp){
       case '\n':
       if (count){
         str[count] = '\0';
-        char *ret = (char *)malloc(sizeof(char)*(count+1));
+        char *ret = (char *)calloc((count+1),sizeof(char));
         int i = 0;
         while(i < count + 1){
           ret[i] = str[i];

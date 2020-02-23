@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "getgrammar.h"
 
 unit** firstarray;
@@ -31,6 +29,9 @@ void addtoarray(unit* head, unit* nextunit){
     return;
   }
   do{
+    if(strcmp(ptr -> term, nextunit->term) == 0)
+    return;
+
     if(ptr->next == NULL){
       break;
     }
@@ -40,7 +41,7 @@ void addtoarray(unit* head, unit* nextunit){
     return;
   }while(ptr -> next);
 
-  unit *new = malloc(sizeof(unit));
+  unit *new = calloc(1,sizeof(unit));
   new -> term = nextunit->term;
   new -> terminal = nextunit->terminal;
   new -> next = NULL;
@@ -71,7 +72,7 @@ int canbeEpsilon(unit* ptr){
   if(ptr->terminal == 0){
     return 0;
   }
-  unit* new= calloc(1,sizeof(unit));
+  unit* new;//= calloc(1,sizeof(unit));
   for(int i=0;i<arraySize;i++){
       if(strcmp(grammararray[i] -> term,ptr->term) == 0){
       int counter = grammararray[i]->count -1;
@@ -90,17 +91,15 @@ int canbeEpsilon(unit* ptr){
   return 0;
 }
 
-
-unit* first(unit* input){
-  unit* new= calloc(1,sizeof(unit));
+void first(unit* input, unit* new){
   if(strcmp(input->term,"eps") == 0){
     new->term = "eps";
     new->terminal = 0;
-    return new;
+    return;
   }else if(input->terminal == 0){
     new->term = input->term;
     new->terminal = input->terminal;
-    return new;
+    return;
   }else{
     for(int j = 0; j < arraySize; j++){
       if(strcmp(grammararray[j] -> term,input -> term) == 0){
@@ -109,52 +108,57 @@ unit* first(unit* input){
         for(int i=0;i<counter-1;i++){
           if(!canbeEpsilon(new2))
           break;
-
-          mergelist(first(new2),new);
+          unit * temp = calloc(1,sizeof(unit));
+          first(new2,temp);
+          mergelist(temp,new);
+          free(temp);
           new2 = new2->next;if(new2==NULL){break;}
         }
-        mergelist(first(new2),new);
-        }
+        unit * temp = calloc(1,sizeof(unit));
+        first(new2,temp);
+        mergelist(temp,new);
+        free(temp);        }
       }
     }
-    return new;
+    return;
   }
 
-unit* follow(unit* input){
-  unit* new1= calloc(1,sizeof(unit));
+void follow(unit* input, unit* new1){
   if(strcmp("program",input -> term) == 0){
     new1->term = "$";
+    return;
   }
   for(int j = 0; j < arraySize; j++){
     unit* new2 = grammararray[j] -> next;
     int counter = grammararray[j]->count -1;
       for(int i=0;i<counter;i++){
         if(strcmp(new2 -> term,input -> term) == 0){//found it
-          printf("%s \n",new2->term);
-
-          unit* new= calloc(1,sizeof(unit));
-          new->term = new2->term;
-          new->terminal = new2->terminal;
-          new->next = new2->next;
-
+          unit* new=new2;
           if(new->next == NULL){
             if(strcmp(input -> term,grammararray[j]->term) != 0){
-              mergelist(follow(grammararray[j]),new1);
+              follow(grammararray[j],new1);
             }//otherwise let it go
           }else{
             new = new->next;
             if(strcmp(input -> term,new -> term) != 0){
-              mergelist(first(new),new1);
-
-              if(canbeEpsilon(new)){
+              unit * temp = calloc(1,sizeof(unit));
+              first(new,temp);
+              mergelist(temp,new1);
+              free(temp);
+              while(canbeEpsilon(new)){
                 if(new->next==NULL){
                   if(strcmp(input -> term,grammararray[j]->term) != 0){
-                    mergelist(follow(grammararray[j]),new1);
+                    follow(grammararray[j],new1);
                   }
-                }else{
-                  mergelist(follow(new),new1);
+                  break;
                 }
-
+                else{
+                  unit * temp = calloc(1,sizeof(unit));
+                  first(new->next,temp);
+                  mergelist(temp,new1);
+                  free(temp);
+                  new = new->next;
+                }
               }
             }
           }
@@ -162,7 +166,7 @@ unit* follow(unit* input){
         new2 = new2->next;
       }
   }
-  return new1;
+  return;
 }
 
 void createfirst(){
@@ -172,11 +176,14 @@ void createfirst(){
     firstarray[j] -> terminal = grammararray[j] -> terminal;
     firstarray[j] -> next = NULL;
   }
-
-  int i;
-  for(i = 0; i<arraySize; i++){
-    unit* head = first(grammararray[i]);
-    mergelist(head,firstarray[i]);
+  for(int i = 0; i<arraySize; i++){
+    unit* new1= calloc(1,sizeof(unit));
+    first(grammararray[i], new1);
+    //printf("first of %s\n",grammararray[i]->term);
+    //printf("------------------------\n");
+    mergelist(new1,firstarray[i]);
+    free(new1);
+    //showlist(firstarray[i]);
   }
 }
 
@@ -187,16 +194,19 @@ void createfollow(){
     followarray[j] -> terminal = grammararray[j] -> terminal;
     followarray[j] -> next = NULL;
   }
-
   int i;
   for(i = 0; i<arraySize; i++){
-    unit* head = first(grammararray[i]);
-    mergelist(head,followarray[i]);
+    unit* new1= calloc(1,sizeof(unit));
+    follow(grammararray[i], new1);
+    //printf("follow of %s\n",grammararray[i]->term);
+    mergelist(new1,followarray[i]);
+    free(new1);
+    //showlist(followarray[i]);
+    //printf("------------------------\n");
   }
 }
 
 void main(){
   getgrammar();
-  createfirst();
   createfollow();
 }

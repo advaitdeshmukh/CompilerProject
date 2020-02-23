@@ -30,7 +30,7 @@ tokenInfo* getnexttoken(FILE *fp){
     int idcount = 0;
     char nextChar;
     unsigned count = 0;
-	tokenInfo* temp =(tokenInfo*)malloc(sizeof(tokenInfo));
+	tokenInfo* temp =(tokenInfo*)calloc(1,sizeof(tokenInfo));
 
 	while(1){
 		nextChar = getCharacter(fp);
@@ -429,7 +429,7 @@ void printToken(tokenInfo* t) {
 int main(){
 	createHASH();
 	FILE* fp = fopen("testcase.txt","r");
-	tokenInfo* temp1 = (tokenInfo*)malloc(sizeof(struct symbols));
+	tokenInfo* temp1 = (tokenInfo*)calloc(1,sizeof(struct symbols));
 	do {
 		temp1 = getnexttoken(fp);
 		printToken(temp1);
