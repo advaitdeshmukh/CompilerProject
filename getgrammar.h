@@ -12,6 +12,7 @@ typedef struct unit {
 char buffer[MAX_BUFFER_SIZE]; // the input buffer
 int bufferPosition; // indicates the current character to be read from the buffer
 int isNT = 0;
+int bufferSize = -1;
 int arraySize = 50;
 unit** grammararray;
 unit** firstarray;

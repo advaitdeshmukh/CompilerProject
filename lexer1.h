@@ -3,26 +3,26 @@
 
 #define MAX_BUFFER_SIZE 1024
 
-char buffer[MAX_BUFFER_SIZE]; // the input buffer
-int bufferPosition; // indicates the current character to be read from the buffer
-int bufferSize = -1; // the number of characters stored in the buffer (-1 indicates first use)
+char buffer1[MAX_BUFFER_SIZE]; // the input buffer
+int bufferPosition1; // indicates the current character to be read from the buffer
+int bufferSize1 = -1; // the number of characters stored in the buffer (-1 indicates first use)
 
 char getCharacter(FILE *fp) {
 
-	if(bufferSize == -1 || bufferPosition == bufferSize) {
+	if(bufferSize1 == -1 || bufferPosition1 == bufferSize1) {
         // first call to getCharacter or end of buffer has been reached
-        bufferSize = fread(buffer, sizeof(char), (size_t)MAX_BUFFER_SIZE, fp);
-        bufferPosition = 1;
-        if(bufferSize == 0)
+        bufferSize1 = fread(buffer1, sizeof(char), (size_t)MAX_BUFFER_SIZE, fp);
+        bufferPosition1 = 1;
+        if(bufferSize1 == 0)
             return 26; // eof
         else
-            return buffer[0];
+            return buffer1[0];
     }
 
-    if(bufferSize == 0) // eof has been reached
+    if(bufferSize1 == 0) // eof has been reached
         return 26;
     else
-        return buffer[bufferPosition++];
+        return buffer1[bufferPosition1++];
 }
 
 tokenInfo* getnexttoken(FILE *fp){
@@ -57,7 +57,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
-					bufferPosition--;//retracting
+					bufferPosition1--;//retracting
 					temp -> tokenName = "COLON";
 					return temp;
 				}
@@ -132,7 +132,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					}
 				}
 				else{
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> tokenName = "MUL";
 					temp -> lexeme[count-1] = '\0';
 					return temp;
@@ -147,7 +147,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> lexeme[count-1] = 'I';
 					return temp;
 				}
@@ -160,7 +160,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> lexeme[count-1] = 'I';
 					return temp;
 				}
@@ -173,7 +173,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> lexeme[count-1] = 'I';
 					return temp;
 				}
@@ -196,13 +196,13 @@ tokenInfo* getnexttoken(FILE *fp){
 						return temp;
 					}
 					else{
-						bufferPosition--;
+						bufferPosition1--;
 						temp -> tokenName = "DEF";
 						return temp;
 					}
 
 					default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> tokenName = "LT";
 					return temp;
 				}
@@ -225,13 +225,13 @@ tokenInfo* getnexttoken(FILE *fp){
 						return temp;
 					}
 					else{
-						bufferPosition--;
+						bufferPosition1--;
 						temp -> tokenName = "ENDDEF";
 						return temp;
 					}
 
 					default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> tokenName = "GT";
 					return temp;
 				}
@@ -272,7 +272,7 @@ tokenInfo* getnexttoken(FILE *fp){
 					break;
 
 					default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> tokenName = "NUM";
 					temp -> lexeme[count-1] = '\0';
 					return temp;
@@ -286,8 +286,8 @@ tokenInfo* getnexttoken(FILE *fp){
 					break;
 
 				case '.':
-					bufferPosition--;
-					bufferPosition--;
+					bufferPosition1--;
+					bufferPosition1--;
 					temp -> tokenName = "NUM";
 					temp -> lexeme[count-1] = '\0';
 					temp -> lexeme[count-2] = '\0';
@@ -307,7 +307,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp->tokenName = "RNUM";
 					temp -> lexeme[count-1] = '\0';
 					return temp;
@@ -326,8 +326,8 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
-				bufferPosition--;
-				bufferPosition--;
+				bufferPosition1--;
+				bufferPosition1--;
 				temp -> tokenName = "RNUM";
 				temp -> lexeme[count-1] = '\0';
 				temp -> lexeme[count-2] = '\0';
@@ -350,7 +350,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> lexeme[count-1] = '\0';
 					temp->tokenName ="RNUM";
 					return temp;
@@ -367,7 +367,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
-					bufferPosition--;
+					bufferPosition1--;
 					temp -> tokenName = "ID";
 					temp -> lexeme[count-1] = '\0';
 					char* token = searchInHASH(temp -> lexeme);
@@ -382,7 +382,7 @@ tokenInfo* getnexttoken(FILE *fp){
 			if(idcount==18)
 			{
 				temp->tokenName = "ID";
-				bufferPosition--;
+				bufferPosition1--;
 				idcount =0;
 				temp -> lexeme[count-1] = '\0';
 				char* token = searchInHASH(temp -> lexeme);
@@ -401,7 +401,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
-				bufferPosition--;
+				bufferPosition1--;
 				temp -> tokenName = "ID";
 				temp -> lexeme[count-1] = '\0';
 				char* token = searchInHASH(temp -> lexeme);

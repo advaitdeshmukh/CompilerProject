@@ -96,7 +96,7 @@ void parse( parseTree *p , tokenInfo * temp){
     int grammarno = (table[rowid][columnid]) - 1;
     if(grammarno >= 0 ){
       printf("%d\n\n",grammarno);
-      unit * gru = GRAMMAR[grammarno];
+      unit * gru = grammararray[grammarno];
       unit * gram = gru;
       unit * gram1 = gru;
       pop();
@@ -180,20 +180,27 @@ else{
 
 
 
-int main()
-{
-    getgrammar();
-    createfirst();
-    createfollow();
-    createParseTable();
+int main(){
+   getgrammar();
+   // createfirst();
+   // createfollow();
+   // createParseTable();
+   createHASH();
+  	FILE* fg = fopen("t1.txt","r");
+  	tokenInfo* temp1 = (tokenInfo*)calloc(1,sizeof(struct symbols));
+  	do {
+  		temp1 = getnexttoken(fg);
+  		printToken(temp1);
+  	} while(temp1 -> tokenName != "EOF");
+
     // createHASH();
-    // FILE* fp = fopen("testcase1.txt","r");
+    // FILE* fp = fopen("t1.txt","r");
     // push("dollar",0);
     // push("program",1);
     // display();
     // printf("\n");
     // tokenInfo* temp1 = (tokenInfo*)malloc(sizeof(struct symbols));
-
+    //
     // do {
     //  temp1 = getnexttoken(fp);
     //  //printf("%s \n",temp1->tokenName);
@@ -204,10 +211,10 @@ int main()
 //  for(int j=0;j<7;j++)
 //      table[i][j] = -1;
 
-        temp1->tokenName = "modules";
-        temp1->lineNum = 1;
-        parse( &p , temp1);
-        printf("\nme hoon na \n");
+        // temp1->tokenName = "modules";
+        // temp1->lineNum = 1;
+        // parse( &p , temp1);
+        // printf("\nme hoon na \n");
 
         // temp1->tokenName = "othermodules";
         // parse( &p , temp1);
