@@ -15,15 +15,79 @@ int bufferSize = -1; // the number of characters stored in the buffer (-1 indica
 int isNT = 0;
 int arraySize = 50;
 unit** grammararray;
+unit** firstarray;
+unit** followarray;
+
+int strcmp(const char *X, const char *Y){
+  while (*X) {
+    if (*X != *Y)
+    break;
+    X++;
+    Y++;
+  }
+	return *(const unsigned char*)X - *(const unsigned char*)Y;
+}
+
+void showfirstfollow (unit *head){
+  unit *ptr = head;
+  char* str = head->term;
+  printf(" of %s -> ",ptr -> term);
+  ptr = ptr -> next;
+  while(ptr -> next){
+      printf(" %s ",ptr -> term);
+      ptr = ptr -> next;
+      str = ptr -> term;
+  }
+  printf(" %s;\n\n",ptr -> term);
+}
+
+void showfollow(){
+  char* prevterm="";
+  printf("List of Follow Set: \n\n");
+  for(int i = 0; i<arraySize; i++){
+    if(strcmp(prevterm,followarray[i]->term)==0){
+      continue;
+    }
+    printf("Follow ");
+    showfirstfollow(followarray[i]);
+    prevterm = followarray[i]->term;
+  }
+}
+
+void showgrammar(){
+  char* prevterm="";
+  printf("Grammar: \n\n");
+  for(int i = 0; i<arraySize; i++){
+    if(strcmp(prevterm,followarray[i]->term)==0){
+      continue;
+    }
+    printf("Definition ");
+    showfirstfollow(grammararray[i]);
+    prevterm = followarray[i]->term;
+  }
+}
+
+void showfirst(){
+  char* prevterm="";
+  printf("List of First Set: \n\n");
+  for(int i = 0; i<arraySize; i++){
+    if(strcmp(prevterm,followarray[i]->term)==0){
+      continue;
+    }
+    printf("First ");
+    showfirstfollow(firstarray[i]);
+    prevterm = followarray[i]->term;
+  }
+}
 
 void showlist (unit *head){
   printf("showlist of %s",head->term);
     unit *ptr = head;
     while(ptr -> next){
-        printf("term:%s\nterminal: %u \nnext: %s\ncount:%u\n\n",ptr -> term, ptr -> terminal,ptr ->next,ptr ->count);
+        printf("term:%s\nterminal: %u \ncount:%u\n\n",ptr -> term, ptr -> terminal,ptr ->count);
         ptr = ptr -> next;
     }
-    printf("term:%s\nterminal: %u \nnext: %s\ncount:%u\n\n\n",ptr -> term, ptr -> terminal,ptr ->next,ptr ->count);
+    printf("term:%s\nterminal: %u \ncount:%u\n\n\n",ptr -> term, ptr -> terminal,ptr ->count);
 }
 
 char getnextcharacter(FILE *fp){

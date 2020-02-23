@@ -1,24 +1,10 @@
 #include "getgrammar.h"
 
-unit** firstarray;
-unit** followarray;
-int isEpsilon = 0;
-
 enum nonTerminals
   {program, moduleDeclarations, moduleDeclaration, otherModules, driverModule, moduleDef, module, ret, input_plist, N1, output_plist, N2, dataType, type, statements, statement, ioStmt, boolConstt, var_id_num, var, whichId, simpleStmt, assignmentStmt, whichStmt, lvalueIDStmt, lvalueARRStmt, index, moduleReuseStmt, optional, idList, N3, U, new_NT, unary_op, arithmeticOrBooleanExpr, N7, AnyTerm, N8, expression, arithmeticExpr, N4, term, N5, factor, op1, op2, logicalOp, relationalOp, declareStmt, conditionalStmt, caseStmts, N9, value, Default, iterativeStmt, range_arrays, range};
 
 enum Terminals
   {ID, NUM, RNUM, INTEGER, REAL, BOOLEAN, OF, ARRAY, START, END, DECLARE, MODULE, DRIVER, PROGRAM, GET_VALUE, PRINT, USE, WITH, PARAMETERS, TRUE, FALSE, TAKES, INPUT, RETURNS, AND, OR, FOR, IN, SWITCH, CASE, BREAK, DEFAULT, WHILE, PLUS, MINUS, MUL, DIV, LT, LE, GE, GT, EQ, NE, DEF, ENDDEF, DRIVERDEF, DRIVERENDDEF, COLON, RANGEOP, SEMICOL, COMMA, ASSIGNOP, SQBO, SQBC, BO, BC, eps, $ };
-
-int strcmp(const char *X, const char *Y){
-  while (*X) {
-    if (*X != *Y)
-    break;
-    X++;
-    Y++;
-  }
-	return *(const unsigned char*)X - *(const unsigned char*)Y;
-}
 
 void addtoarray(unit* head, unit* nextunit){
   unit *ptr = head;
@@ -179,11 +165,10 @@ void createfirst(){
   for(int i = 0; i<arraySize; i++){
     unit* new1= calloc(1,sizeof(unit));
     first(grammararray[i], new1);
-    //printf("first of %s\n",grammararray[i]->term);
-    //printf("------------------------\n");
     mergelist(new1,firstarray[i]);
     free(new1);
-    //showlist(firstarray[i]);
+    //showfirst(firstarray[i]);
+    //printf("------------------------\n");
   }
 }
 
@@ -198,15 +183,17 @@ void createfollow(){
   for(i = 0; i<arraySize; i++){
     unit* new1= calloc(1,sizeof(unit));
     follow(grammararray[i], new1);
-    //printf("follow of %s\n",grammararray[i]->term);
     mergelist(new1,followarray[i]);
     free(new1);
-    //showlist(followarray[i]);
+    //showfollow(followarray[i]);
     //printf("------------------------\n");
   }
 }
 
+
 void main(){
   getgrammar();
+  createfirst();
   createfollow();
+  showgrammar();
 }
