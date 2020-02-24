@@ -55,7 +55,7 @@ int canbeEpsilon(unit* ptr){
   unit* new;//= calloc(1,sizeof(unit));
   for(int i=0;i<arraySize;i++){
       if(strcmp(grammararray[i] -> term,ptr->term) == 0){
-      int counter = grammararray[i]->count -1;
+      int counter = countarray[i] -1;
       new = grammararray[i]->next;
       int j;
       for(j=0;j<counter;j++){
@@ -84,7 +84,7 @@ void first(unit* input, unit* new){
     for(int j = 0; j < arraySize; j++){
       if(strcmp(grammararray[j] -> term,input -> term) == 0){
         unit* new2 = grammararray[j] -> next;
-        int counter = grammararray[j]->count -1;
+        int counter = countarray[j] -1;
         for(int i=0;i<counter-1;i++){
           if(!canbeEpsilon(new2))
           break;
@@ -105,14 +105,19 @@ void first(unit* input, unit* new){
 
 void follow(unit* input, unit* new1){
   if(strcmp("program",input -> term) == 0){
-    new1->term = "$";
+    unit * temp = calloc(1,sizeof(unit));
+    temp->term = "$";
+    temp->terminal = 0;
+    mergelist(temp,new1);
+    free(temp);
     return;
   }
   for(int j = 0; j < arraySize; j++){
     unit* new2 = grammararray[j] -> next;
-    int counter = grammararray[j]->count -1;
+    int counter = countarray[j] -1;
       for(int i=0;i<counter;i++){
         if(strcmp(new2 -> term,input -> term) == 0){//found it
+          printf("found it");
           unit* new=new2;
           if(new->next == NULL){
             if(strcmp(input -> term,grammararray[j]->term) != 0){
@@ -123,6 +128,7 @@ void follow(unit* input, unit* new1){
             if(strcmp(input -> term,new -> term) != 0){
               unit * temp = calloc(1,sizeof(unit));
               first(new,temp);
+              printf("iska first maanga %s\n",new->term);
               mergelist(temp,new1);
               free(temp);
               while(canbeEpsilon(new)){
@@ -135,6 +141,7 @@ void follow(unit* input, unit* new1){
                 else{
                   unit * temp = calloc(1,sizeof(unit));
                   first(new->next,temp);
+                  printf("iska first maanga 1 %s\n",new->next->term);
                   mergelist(temp,new1);
                   free(temp);
                   new = new->next;
@@ -185,7 +192,9 @@ void createfollow(){
 }
 
 
-// void main(){
-//   getgrammar();
-//   showgrammar();
-// }
+void main(){
+  getgrammar();
+  createfollow();
+  printf("\n-------------\n");
+  showfollow();
+}

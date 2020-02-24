@@ -181,7 +181,7 @@ else{
 
 
 int main(){
-   getgrammar();
+   //getgrammar();
    // createfirst();
    // createfollow();
    // createParseTable();

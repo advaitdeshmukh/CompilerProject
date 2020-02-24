@@ -205,15 +205,17 @@ void createParseTable(){
       }
     }
     for(int i=0;i<57;i++){
+       printf("Row no %d\n", i);
       for(int j=0; j<57; j++){
+        printf("%d ", table[i][j]);
       }
     }
 }
-// int main()
-// {
-//     getgrammar();
-//     createfirst();
-//     createfollow();
+int main()
+{
+    getgrammar();
+    createfirst();
+    createfollow();
 //     // showlist(grammararray[99]);
 //     // printf("\n___________\nfirst\n");
 //     // showlist(firstarray[99]);
@@ -221,5 +223,5 @@ void createParseTable(){
 //     // showlist(followarray[99]);
 //     //showfirst();
 //     //showlist(follow(grammararray[65]));
-//     createParseTable();
-// }
+    createParseTable();
+}

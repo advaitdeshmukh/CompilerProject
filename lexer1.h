@@ -1,7 +1,7 @@
 #include "lexer.h"
 #include "hasher.h"
 
-#define MAX_BUFFER_SIZE 1024
+#define MAX_BUFFER_SIZE 3
 
 char buffer1[MAX_BUFFER_SIZE]; // the input buffer
 int bufferPosition1; // indicates the current character to be read from the buffer
@@ -12,6 +12,7 @@ char getCharacter(FILE *fp) {
 	if(bufferSize1 == -1 || bufferPosition1 == bufferSize1) {
         // first call to getCharacter or end of buffer has been reached
         bufferSize1 = fread(buffer1, sizeof(char), (size_t)MAX_BUFFER_SIZE, fp);
+				//printf("\n buffer size=%lu\n",(size_t)MAX_BUFFER_SIZE);
         bufferPosition1 = 1;
         if(bufferSize1 == 0)
             return 26; // eof
@@ -42,7 +43,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				case ' ':
 				case '\t':
 				case '\r':
-				count--;
+				count=0;
 				break;
 
 				case ';':
@@ -58,6 +59,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				}
 				else{
 					bufferPosition1--;//retracting
+
 					temp -> tokenName = "COLON";
 					return temp;
 				}
@@ -111,9 +113,10 @@ tokenInfo* getnexttoken(FILE *fp){
 							case '*':
 							starCount++;
 							if (starCount == 2){
-								temp -> lineNum = line_num; // yaha kuch changes karna hai.......
+								//temp -> lineNum = line_num; // yaha kuch changes karna hai.......
 								i = 0;
 							}
+							count = 0;
 							break;
 
 							case '\n':
@@ -147,10 +150,11 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
+					printf("stray '=' on line: %u\n",line_num);
 					bufferPosition1--;
-					temp -> lexeme[count-1] = 'I';
-					return temp;
+					count=0;
 				}
+				break;
 
 				case '!':
 				nextChar = getCharacter(fp);
@@ -160,10 +164,11 @@ tokenInfo* getnexttoken(FILE *fp){
 					return temp;
 				}
 				else{
+					printf("stray '!' on line: %u\n",line_num);
 					bufferPosition1--;
-					temp -> lexeme[count-1] = 'I';
-					return temp;
+					count=0;
 				}
+				break;
 
 				case '.':
 				nextChar = getCharacter(fp);
@@ -171,12 +176,12 @@ tokenInfo* getnexttoken(FILE *fp){
 					temp -> lexeme[count++] = nextChar;
 					temp -> tokenName = "RANGEOP";
 					return temp;
-				}
-				else{
+				}else{
+					printf("stray '.' on line number %u\n",line_num);
 					bufferPosition1--;
-					temp -> lexeme[count-1] = 'I';
-					return temp;
+					count=0;
 				}
+				break;
 
 
 				case '<':
@@ -282,16 +287,25 @@ tokenInfo* getnexttoken(FILE *fp){
 			case 6:
 			switch(nextChar){
 				case '0'...'9':
-					state = 7;
-					break;
+				state = 7;
+				break;
 
 				case '.':
-					bufferPosition1--;
-					bufferPosition1--;
-					temp -> tokenName = "NUM";
-					temp -> lexeme[count-1] = '\0';
-					temp -> lexeme[count-2] = '\0';
-					return temp;
+				bufferPosition1--;
+				bufferPosition1--;
+				temp -> tokenName = "NUM";
+				temp -> lexeme[count-1] = '\0';
+				temp -> lexeme[count-2] = '\0';
+				return temp;
+
+			  default:
+				printf("stray '.' on line: %u\n",line_num);
+				bufferPosition1--;
+				temp -> tokenName = "NUM";
+				temp -> lexeme[count-1] = '\0';
+				temp -> lexeme[count-2] = '\0';
+				return temp;
+
 			}
 			break;
 
@@ -367,6 +381,7 @@ tokenInfo* getnexttoken(FILE *fp){
 				break;
 
 				default:
+				//printf("yaha");
 					bufferPosition1--;
 					temp -> tokenName = "ID";
 					temp -> lexeme[count-1] = '\0';
@@ -422,7 +437,7 @@ tokenInfo* getnexttoken(FILE *fp){
 }
 
 void printToken(tokenInfo* t) {
-    printf("%u %s \n", t -> lineNum, t -> tokenName);
+    printf("%u %s lexeme: %s\n", t -> lineNum, t -> tokenName, t->lexeme);
 }
 
 
