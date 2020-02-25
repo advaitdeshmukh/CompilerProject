@@ -34,11 +34,11 @@ void showfirstfollow (unit *head){
   printf(" of %s -> ",ptr -> term);
   ptr = ptr -> next;
   while(ptr -> next){
-      printf(" %s ",ptr -> term);
+      printf(" %s %u",ptr -> term,ptr->terminal);
       ptr = ptr -> next;
       str = ptr -> term;
   }
-  printf(" %s;\n\n",ptr -> term);
+  printf(" %s %u;\n\n",ptr -> term,ptr->terminal);
 }
 
 void showfollow(){
@@ -52,15 +52,10 @@ void showfollow(){
 }
 
 void showgrammar(){
-  char* prevterm="";
   printf("Grammar: \n\n");
   for(int i = 0; i<arraySize; i++){
-    if(strcmp(prevterm,grammararray[i]->term)==0){
-      continue;
-    }
     printf("Definition ");
     showfirstfollow(grammararray[i]);
-    prevterm = grammararray[i]->term;
   }
 }
 
@@ -117,6 +112,7 @@ void addunit(unit *head, char* value1, int is){
     ptr = ptr -> next;
   }
   ptr -> next = new;
+  return;
 }
 
 char* getnextterm(FILE *fp){
@@ -133,7 +129,7 @@ char* getnextterm(FILE *fp){
       case ' ':
       if (count){
         str[count] = '\0';
-        char *ret = (char *)calloc(count+1,sizeof(char));
+        char *ret = (char *)calloc(count+2,sizeof(char));
         int i = 0;
         while(i < count+1){
           ret[i] = str[i];
@@ -147,7 +143,7 @@ char* getnextterm(FILE *fp){
       case '\n':
       if (count){
         str[count] = '\0';
-        char *ret = (char *)calloc((count+1),sizeof(char));
+        char *ret = (char *)calloc(count+2,sizeof(char));
         int i = 0;
         while(i < count + 1){
           ret[i] = str[i];
@@ -170,7 +166,7 @@ void getnextrule(FILE *fp, unit* head,int index){
   char next;
   int counter = 0;
 	do{
-    char* nextterm = getnextterm(fp);
+    char *nextterm = getnextterm(fp);
     if (nextterm != NULL){
       addunit(head, nextterm, isNT);
       counter++;
@@ -200,12 +196,11 @@ unit** resizearray(unit** array){
 }
 
 void getgrammar(){
-	  FILE* fp = fopen("testcase.txt", "r");
+	  FILE* fp = fopen("grammar.txt", "r");
     countarray = (int*)calloc(1, arraySize*sizeof(int));
     grammararray=initializearray(grammararray);
     char next;
     int index = 0;
-    printf("hi");
     do {
       if(index == arraySize){
         grammararray=resizearray(grammararray);
@@ -223,7 +218,8 @@ void getgrammar(){
 }
 
 // int main(){
-//   countarray = (int*)calloc(1, arraySize*sizeof(int));
+//   //countarray = (int*)calloc(1, arraySize*sizeof(int));
 //   getgrammar();
-//   showlist(grammararray[0],0);
+//   showgrammar();
+//   //showlist(grammararray[0],0);
 // }

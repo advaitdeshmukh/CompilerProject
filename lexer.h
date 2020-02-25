@@ -21,5 +21,5 @@ int line_num = 1;
 
 #endif
 char * hasher(char * id);
-tokenInfo* getnexttoken(FILE *fp);
+tokenInfo* getnexttoken(FILE *fp, tokenInfo* temp);
 //tokenInfo lexing(FILE * fp);

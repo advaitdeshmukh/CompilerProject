@@ -1,12 +1,27 @@
 #include "lexer.h"
 #include "hasher.h"
 
-#define MAX_BUFFER_SIZE 3
+#define MAX_BUFFER_SIZE 256
 
 char buffer1[MAX_BUFFER_SIZE]; // the input buffer
 int bufferPosition1; // indicates the current character to be read from the buffer
 int bufferSize1 = -1; // the number of characters stored in the buffer (-1 indicates first use)
+char buffer2[100];
 
+char *strcpy(char *destination, char *source)
+{
+    char *start = destination;
+
+    while(*source != '\0')
+    {
+        *destination = *source;
+        destination++;
+        source++;
+    }
+
+    *destination = '\0'; // add '\0' at the end
+    return start;
+}
 char getCharacter(FILE *fp) {
 
 	if(bufferSize1 == -1 || bufferPosition1 == bufferSize1) {
@@ -26,16 +41,16 @@ char getCharacter(FILE *fp) {
         return buffer1[bufferPosition1++];
 }
 
-tokenInfo* getnexttoken(FILE *fp){
+tokenInfo* getnexttoken(FILE *fp,tokenInfo* temp){
     int state = 0;
     int idcount = 0;
     char nextChar;
     unsigned count = 0;
-	tokenInfo* temp =(tokenInfo*)calloc(1,sizeof(tokenInfo));
+		for(int c=0;c<100;c++){buffer2[c]='\0';}
 
 	while(1){
 		nextChar = getCharacter(fp);
-		temp -> lexeme[count++] = nextChar;
+		buffer2[count++] = nextChar;
 		temp -> lineNum = line_num;
 		switch(state){
 			case 0:
@@ -48,63 +63,74 @@ tokenInfo* getnexttoken(FILE *fp){
 
 				case ';':
 				temp -> tokenName = "SEMICOL";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case ':':
 				nextChar = getCharacter(fp);
 				if (nextChar == '='){
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "ASSIGNOP";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				else{
 					bufferPosition1--;//retracting
 
 					temp -> tokenName = "COLON";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				break;
 
 				case ',':
 				temp -> tokenName = "COMMA";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '[':
 				temp -> tokenName = "SQBO";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case ']':
 				temp -> tokenName = "SQBC";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '(':
 				temp -> tokenName = "BO";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case ')':
 				temp -> tokenName = "BC";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '+':
 				temp -> tokenName = "PLUS";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '-':
 				temp -> tokenName = "MINUS";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '/':
 				temp -> tokenName = "DIV";
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 				case '*':
 				nextChar = getCharacter(fp);
 				int commentline = line_num;
-				temp -> lexeme[count++] = nextChar;
+				buffer2[count++] = nextChar;
 				if (nextChar == '*'){
 					int starCount = 0;
-					temp -> lexeme[count-1]='\0';
-					temp -> lexeme[count-2]='\0';
+					buffer2[count-1]='\0';
+					buffer2[count-2]='\0';
 					int i = 1;
 					while(i){
 						//printf("stuck %c %s\n",nextChar,temp -> lexeme);
@@ -137,7 +163,8 @@ tokenInfo* getnexttoken(FILE *fp){
 				else{
 					bufferPosition1--;
 					temp -> tokenName = "MUL";
-					temp -> lexeme[count-1] = '\0';
+					buffer2[count-1] = '\0';
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				break;
@@ -145,41 +172,41 @@ tokenInfo* getnexttoken(FILE *fp){
 				case '=':
 				nextChar = getCharacter(fp);
 				if (nextChar == '='){
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "EQ";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				else{
-					printf("stray '=' on line: %u\n",line_num);
 					bufferPosition1--;
-					count=0;
+					state=11;
 				}
 				break;
 
 				case '!':
 				nextChar = getCharacter(fp);
 				if (nextChar == '='){
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "NE";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				else{
-					printf("stray '!' on line: %u\n",line_num);
+					state=11;
 					bufferPosition1--;
-					count=0;
 				}
 				break;
 
 				case '.':
 				nextChar = getCharacter(fp);
 				if (nextChar == '.'){
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "RANGEOP";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}else{
-					printf("stray '.' on line number %u\n",line_num);
 					bufferPosition1--;
-					count=0;
+					state=11;
 				}
 				break;
 
@@ -188,27 +215,31 @@ tokenInfo* getnexttoken(FILE *fp){
 				nextChar = getCharacter(fp);
 				switch (nextChar){
 					case '=':
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "LE";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 
 					case '<':
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					nextChar = getCharacter(fp);
 					if (nextChar == '<'){
-						temp -> lexeme[count++] = nextChar;
+						buffer2[count++] = nextChar;
 						temp -> tokenName = "DRIVERDEF";
+						strcpy(temp->lexeme,buffer2);
 						return temp;
 					}
 					else{
 						bufferPosition1--;
 						temp -> tokenName = "DEF";
+						strcpy(temp->lexeme,buffer2);
 						return temp;
 					}
 
 					default:
 					bufferPosition1--;
 					temp -> tokenName = "LT";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				break;
@@ -217,27 +248,31 @@ tokenInfo* getnexttoken(FILE *fp){
 				nextChar = getCharacter(fp);
 				switch (nextChar){
 					case '=':
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					temp -> tokenName = "GE";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 
 					case '>':
-					temp -> lexeme[count++] = nextChar;
+					buffer2[count++] = nextChar;
 					nextChar = getCharacter(fp);
 					if (nextChar == '>'){
-						temp -> lexeme[count++] = nextChar;
+						buffer2[count++] = nextChar;
 						temp -> tokenName = "DRIVERENDDEF";
+						strcpy(temp->lexeme,buffer2);
 						return temp;
 					}
 					else{
 						bufferPosition1--;
 						temp -> tokenName = "ENDDEF";
+						strcpy(temp->lexeme,buffer2);
 						return temp;
 					}
 
 					default:
 					bufferPosition1--;
 					temp -> tokenName = "GT";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 				break;
@@ -279,7 +314,8 @@ tokenInfo* getnexttoken(FILE *fp){
 					default:
 					bufferPosition1--;
 					temp -> tokenName = "NUM";
-					temp -> lexeme[count-1] = '\0';
+					buffer2[count-1] = '\0';
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 				}
 			break;
@@ -294,16 +330,18 @@ tokenInfo* getnexttoken(FILE *fp){
 				bufferPosition1--;
 				bufferPosition1--;
 				temp -> tokenName = "NUM";
-				temp -> lexeme[count-1] = '\0';
-				temp -> lexeme[count-2] = '\0';
+				buffer2[count-1] = '\0';
+				buffer2[count-2] = '\0';
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 			  default:
 				printf("stray '.' on line: %u\n",line_num);
 				bufferPosition1--;
 				temp -> tokenName = "NUM";
-				temp -> lexeme[count-1] = '\0';
-				temp -> lexeme[count-2] = '\0';
+				buffer2[count-1] = '\0';
+				buffer2[count-2] = '\0';
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 
 			}
@@ -323,7 +361,8 @@ tokenInfo* getnexttoken(FILE *fp){
 				default:
 					bufferPosition1--;
 					temp->tokenName = "RNUM";
-					temp -> lexeme[count-1] = '\0';
+					buffer2[count-1] = '\0';
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 			}
 			break;
@@ -343,8 +382,9 @@ tokenInfo* getnexttoken(FILE *fp){
 				bufferPosition1--;
 				bufferPosition1--;
 				temp -> tokenName = "RNUM";
-				temp -> lexeme[count-1] = '\0';
-				temp -> lexeme[count-2] = '\0';
+				buffer2[count-1] = '\0';
+				buffer2[count-2] = '\0';
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 			}
 			break;
@@ -365,10 +405,17 @@ tokenInfo* getnexttoken(FILE *fp){
 
 				default:
 					bufferPosition1--;
-					temp -> lexeme[count-1] = '\0';
+					buffer2[count-1] = '\0';
 					temp->tokenName ="RNUM";
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 			}
+			break;
+
+			case 11:
+			printf("Lexical Error on line: %u lexeme:'%s'\n",line_num,buffer2);
+			count=0;
+			state=0;
 			break;
 
 			case 1:
@@ -384,26 +431,27 @@ tokenInfo* getnexttoken(FILE *fp){
 				//printf("yaha");
 					bufferPosition1--;
 					temp -> tokenName = "ID";
-					temp -> lexeme[count-1] = '\0';
-					char* token = searchInHASH(temp -> lexeme);
+					buffer2[count-1] = '\0';
+					char* token = searchInHASH(buffer2);
 					if(token != NULL){
 						temp -> tokenName = token;
 					}
+					strcpy(temp->lexeme,buffer2);
 					return temp;
 			}
 			break;
 
 			case 2:
-			if(idcount==18)
-			{
+			if(idcount==18){
 				temp->tokenName = "ID";
 				bufferPosition1--;
 				idcount =0;
-				temp -> lexeme[count-1] = '\0';
-				char* token = searchInHASH(temp -> lexeme);
+				buffer2[count-1] = '\0';
+				char* token = searchInHASH(buffer2);
 				if(token != NULL){
 					temp -> tokenName = token;
 				}
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 			}
 			switch(nextChar){
@@ -418,19 +466,21 @@ tokenInfo* getnexttoken(FILE *fp){
 				default:
 				bufferPosition1--;
 				temp -> tokenName = "ID";
-				temp -> lexeme[count-1] = '\0';
-				char* token = searchInHASH(temp -> lexeme);
+				buffer2[count-1] = '\0';
+				char* token = searchInHASH(buffer2);
 				if(token != NULL){
 					temp -> tokenName = token;
 				}
+				strcpy(temp->lexeme,buffer2);
 				return temp;
 			}
 			break;
 		}
 		if (nextChar==26){
-			temp -> lexeme[0] = (char)(26);
+			buffer2[0] = (char)(26);
 			temp -> tokenName = "EOF";
 			temp -> lineNum = line_num;
+			strcpy(temp->lexeme,buffer2);
 			return temp;
 		}
 	}
@@ -446,7 +496,8 @@ void printToken(tokenInfo* t) {
 // 	FILE* fp = fopen("testcase.txt","r");
 // 	tokenInfo* temp1 = (tokenInfo*)calloc(1,sizeof(struct symbols));
 // 	do {
-// 		temp1 = getnexttoken(fp);
+// 		getnexttoken(fp,temp1);
 // 		printToken(temp1);
 // 	} while(temp1 -> tokenName != "EOF");
+// 	free(temp1);
 // }

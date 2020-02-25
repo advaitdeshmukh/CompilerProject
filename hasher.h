@@ -29,17 +29,6 @@ void addnode (node *head, char* value1, char *value2) {
     ptr -> next = new;
 }
 
-// void showlist (node *head) {
-//   node *ptr = head;
-//
-//   while (ptr -> next) {
-//       printf("%s %s\n",ptr -> keyword, ptr -> token);
-//       ptr = ptr -> next;
-//   }
-//
-//   printf ("%s %s\n", ptr -> keyword, ptr -> token);
-// }
-
 char* searchInHASH(char *str){
   int index = (int) str[0];
   if (index > 96){
@@ -105,6 +94,7 @@ void createHASH(){
   addKeyToken("AND", "AND");
   addKeyToken("array", "ARRAY");
   addKeyToken("break", "BREAK");
+  addKeyToken("boolean", "BOOLEAN");
   addKeyToken("case", "CASE");
   addKeyToken("declare", "DECLARE");
   addKeyToken("default", "DEFAULT");

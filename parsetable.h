@@ -134,88 +134,217 @@ int parseIdStr(char *idStr) {
 
 }
 
-void createParseTable(){
-    int leftid;
-    int rightside[20] ;
-    int firstarr[20] ;
-    int followarr[20];
+int idbatao(char *idStr) {
+     // For Non - Terminals
+    if(strcmp(idStr, "program") == 0) return 0;
+    if(strcmp(idStr, "moduleDeclarations") == 0) return 1;
+    if(strcmp(idStr, "moduleDeclaration") == 0) return 3;
+    if(strcmp(idStr, "otherModules") == 0) return 4;
+    if(strcmp(idStr,"driverModule")==0) return 6;
+    if(strcmp(idStr,"moduleDef")==0) return 7;
+    if(strcmp(idStr,"module")==0) return 8;
+    if(strcmp(idStr,"ret")==0) return 9;
+    if(strcmp(idStr,"input_plist")==0) return 11;
+    if(strcmp(idStr,"N1")==0) return 12;
+    if(strcmp(idStr,"output_plist")==0) return 14;
+    if(strcmp(idStr,"N2")==0) return 15;
+    if(strcmp(idStr,"dataType")==0) return 17;
+    if(strcmp(idStr,"type")==0) return 21;
+    if(strcmp(idStr,"statements")==0) return 24;
+    if(strcmp(idStr,"statement")==0) return 26;
+    if(strcmp(idStr,"ioStmt")==0) return 31;
+    if(strcmp(idStr,"boolConstt")==0) return 33;
+    if(strcmp(idStr,"var_id_num")==0) return 35;
+    if(strcmp(idStr,"var")==0) return 38;
+    if(strcmp(idStr,"whichId")==0) return 40;
+    if(strcmp(idStr,"simpleStmt")==0) return 42;
+    if(strcmp(idStr,"assignmentStmt")==0) return 44;
+    if(strcmp(idStr,"whichStmt")==0) return 45;
+    if(strcmp(idStr,"lvalueIDStmt")==0) return 47;
+    if(strcmp(idStr,"lvalueARRStmt")==0) return 48;
+    if(strcmp(idStr,"index")==0) return 49;
+    if(strcmp(idStr,"moduleReuseStmt")==0) return 51;
+    if(strcmp(idStr,"optional")==0) return 52;
+    if(strcmp(idStr,"idList")==0) return 54;
+    if(strcmp(idStr,"N3")==0) return 55;
+    if(strcmp(idStr,"U")==0) return 57;
+    if(strcmp(idStr,"new_NT")==0) return 58;
+    if(strcmp(idStr,"unary_op")==0) return 60;
+    if(strcmp(idStr,"arithmeticOrBooleanExpr")==0) return 62;
+    if(strcmp(idStr,"N7")==0) return 63;
+    if(strcmp(idStr,"AnyTerm")==0) return 65;
+    if(strcmp(idStr,"N8")==0) return 67;
+    if(strcmp(idStr,"expression")==0) return 69;
+    if(strcmp(idStr,"arithmeticExpr")==0) return 71;
+    if(strcmp(idStr,"N4")==0) return 72;
+    if(strcmp(idStr,"term")==0) return 74;
+    if(strcmp(idStr,"N5")==0) return 75;
+    if(strcmp(idStr,"factor")==0) return 77;
+    if(strcmp(idStr,"op1")==0) return 78;
+    if(strcmp(idStr,"op2")==0) return 80;
+    if(strcmp(idStr,"logicalOp")==0) return 82;
+    if(strcmp(idStr,"relationalOp")==0) return 84;
+    if(strcmp(idStr,"declareStmt")==0) return 90;
+    if(strcmp(idStr,"conditionalStmt")==0) return 91;
+    if(strcmp(idStr,"caseStmts")==0) return 92;
+    if(strcmp(idStr,"N9")==0) return 93;
+    if(strcmp(idStr,"value")==0) return 95;
+    if(strcmp(idStr,"default")==0) return 98;
+    if(strcmp(idStr,"iterativeStmt")==0) return 100;
+    if(strcmp(idStr,"range_arrays")==0) return 102;
+    if(strcmp(idStr,"range")==0) return 103;
+}
 
-    for(int i=0; i<57; i++){
-      for(int j=0; j<57; j++){
+
+void findfirstofstring(unit * ptr , int * array,int k)
+{
+    unit * temp = ptr;
+    int index = 0;
+    int count = 0;
+    int flag= 0;
+    while(ptr != NULL)
+    {
+       // printf("grammar term right = %s\n",ptr->term);
+
+        if(ptr->terminal == 1)
+        {   //printf("***********\nkitni baar aaye\n");
+            unit * temp = firstarray[idbatao(ptr->term)];
+            //printf("%u",temp);
+            flag =0;
+            while(temp->next != NULL)
+            {
+                //printf("hellooooooo\n");
+                //printf("%s \n", temp->next->term);
+                array[count] = parseIdStr(temp->next->term);
+                temp = temp ->next;
+                if(array[count] == 57)
+                {
+                    flag = 1;
+                    //printf("flageps\n");
+                }
+                count++;
+            }
+        }
+        else
+        {
+            array[count++] = parseIdStr(ptr->term);
+            break;
+        }
+
+        if(flag == 0 )
+        {   //printf("break flag %d\n",flag);
+            break;
+        }
+        ptr = ptr->next;
+    }
+}
+
+void createParseTable()
+{
+
+    int leftid;
+    for(int i=0; i<57; i++)
+    {
+      for(int j=0; j<57; j++)
+      {
         table[i][j] = -1;
       }
     }
 
-    for(int k = 0 ; k < arraySize ; k++){
-      int flag = 0;
-      for(int i = 0; i < 20;i++){
-        rightside[i] = -1;
-        firstarr[i] = -1;
-        followarr[i] = -1;
-      }
+    int rightside[30] ;
+    int firstarr[30] ;
+    int followarr[30];
 
-      leftid = parseIdStr(grammararray[k] -> term);//the rule has grammararray[i]->term on lhs
+    for(int k = 0 ; k < arraySize ; k++)
+    {
 
-      unit* ptr = grammararray[k];
-
-      int countg =0;
-      while(ptr->next != NULL){
-        rightside[countg] = parseIdStr(ptr->next->term);
-        ptr = ptr->next;
-        countg++;
-      }
-
-      for(int x = 0; x < countg; x++){
-        if(rightside[x] == 57){
-          flag = 1;
-        }
-      }
-
-      if(flag == 0){//unit * temp = first(grammararray[k]);
-        unit* temp = firstarray[k];
-        temp = temp->next;
-
-        int countf = 0;
-        while(temp != NULL){
-          firstarr[countf] = parseIdStr(temp->term);
-          temp = temp->next;
-          countf++;
+        for(int i = 0; i < 30;i++)
+        {
+            rightside[i] = -1;
+            firstarr[i] = -1;
+            followarr[i] = -1;
         }
 
-        for(int i=0;i<20;i++){
-          if(firstarr[i] != -1 && firstarr[i] != 57){
-            table[leftid][firstarr[i]] = k+1;
+        leftid = parseIdStr(grammararray[k] -> term);
+        //printf("\nleftid = %d\n",leftid);
+
+        unit* ptr = grammararray[k];
+
+          int countg =0;
+          unit *ptr1 = ptr->next;
+          unit *ptr2 = ptr1;
+          int flag = 0;
+          while(ptr2 !=NULL)
+          {
+            if(strcmp(ptr2->term,"eps")==0)
+            {
+              flag = 1;
+            }
+            ptr2 = ptr2 ->next;
           }
+
+      if(flag == 1)
+      {
+        unit * adv = followarray[idbatao(grammararray[k]->term)];
+        int countadv = 0;
+        while(adv->next != NULL)
+        {
+            followarr[countadv++] = parseIdStr(adv->next->term);
+            adv = adv ->next;
         }
+        //printf("\nk = %d ###",k);
+        for(int f =0;f<30;f++)
+        {
+            if(followarr[f] != 57 && followarr[f] != -1)
+            {
+                table[leftid][followarr[f]] = k;
+                //printf("%d ",followarr[f]);
+            }
+        }
+        //printf("\n");
       }
-      else{//unit * temp2 = follow(grammararray[k])
-        unit* temp2 = followarray[k];
-        temp2 = temp2->next;
-        int countfo = 0;
-        while(temp2 != NULL){
-          followarr[countfo] = parseIdStr(temp2->term);
-          temp2 = temp2->next;
-          countfo++;
+      else
+      {
+        findfirstofstring(ptr1 , firstarr , k);
+
+        //printf("k = %d ***",k);
+
+        // for(int j=0;j<30;j++)
+        // {
+        //     printf("%d ",firstarr[j]);
+        // }
+        // printf("\n");
+
+        for(int f =0;f<30;f++)
+        {
+            if(firstarr[f] != -1 && firstarr[f] != 57)
+            {
+                table[leftid][firstarr[f]] = k;
+            }
+            else if(firstarr[f] == 57)
+            {
+                unit * ful = followarray[leftid];
+
+                while(ful->next != NULL)
+                {
+                    if(strcmp(ful->next->term,"eps")!=0)
+                    {
+                        table[leftid][parseIdStr(ful->next->term)] = k;
+                    }
+
+                    ful = ful->next;
+                }
+            }
         }
-        for(int i=0;i<20;i++){
-          if(followarr[i] != -1 && followarr[i] != 57){
-            table[leftid][followarr[i]] = k+1;
-          }
-        }
-      }
     }
-    for(int i=0;i<57;i++){
-       printf("Row no %d\n", i);
-      for(int j=0; j<57; j++){
-        printf("%d ", table[i][j]);
-      }
-    }
+
 }
-int main()
-{
-    getgrammar();
-    createfirst();
-    createfollow();
+}
+// void main()
+// {
+//     getgrammar();
+//     createfirst();
+//     createfollow();
 //     // showlist(grammararray[99]);
 //     // printf("\n___________\nfirst\n");
 //     // showlist(firstarray[99]);
@@ -223,5 +352,5 @@ int main()
 //     // showlist(followarray[99]);
 //     //showfirst();
 //     //showlist(follow(grammararray[65]));
-    createParseTable();
-}
+//     createParseTable();
+//   }

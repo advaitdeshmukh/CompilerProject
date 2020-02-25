@@ -12,6 +12,9 @@ typedef struct parseTree {
 
 parseTree p;
 struct unit* top;
+int errorflag =0;
+tokenInfo * temp;
+
 
 void push(char* term, int termin){
   struct unit* temp = (unit*)malloc(sizeof(unit));
@@ -78,151 +81,190 @@ void showlist1 (unit *head){
 }
 
 void reversepush(struct unit* head){
-  if (head == NULL)
+  if (head == NULL || head->term == "eps")
   return;
 
   reversepush(head->next);
+  printf("******************fuckit\n*********************");
   push(head->term , head-> terminal);
 }
 
-void parse( parseTree *p , tokenInfo * temp){
-  int columnid = parseIdStr(temp->tokenName);
-  printf("%d\n",columnid);
-  unit * piku = peek();
-  if(piku->terminal == 1){
-    printf("inside nonterminal case\n");
-    int rowid = parseIdStr(piku -> term);
-    printf("%d\n",rowid);
-    int grammarno = (table[rowid][columnid]) - 1;
-    if(grammarno >= 0 ){
-      printf("%d\n\n",grammarno);
-      unit * gru = grammararray[grammarno];
-      unit * gram = gru;
-      unit * gram1 = gru;
-      pop();
-      reversepush(gru->next);
-      printf("\n\n");
-      int child = 0;
+void parse( FILE *fg, parseTree *p )
+{
+    //printf("token name %s  \n",temp->tokenName);
+    int columnid = parseIdStr(temp->tokenName);
+    printf("column id %d\n",columnid);
 
-      while(gram->next!=NULL){
-        child++;
-        gram = gram->next;
-      }
-
-      p->noOfChildren = child;
-      printf("p->child %d\n",p->noOfChildren);
-      p->children = (parseTree *)malloc(p->noOfChildren * sizeof(parseTree));
-      int count = 0;
-      while(gru ->next != NULL){
-        unit* temp1 = gru->next;
-        if(temp1->terminal == 0){
-        printf("hi terminal\n");
-        p->children[count].isTerminal = 0;
-        p->children[count].terminal.tokenName = temp1->term;
-      }
-      else{
-        printf("hi non terminal\n");
-        p->children[count].isTerminal = 1;
-        p->children[count].nonTerminal = parseIdStr(temp1->term);
-      }
-      gru->next = gru->next ->next;
+    unit * piku = peek();
+    if(strcmp(piku->term,"$")==0)
+    {
+        return;
     }
-    tokenInfo * temp1 = temp;
-    tokenInfo * temp2 = (tokenInfo*)malloc(sizeof(tokenInfo));
-    temp2 -> tokenName = "othermodules";
-    temp2 -> lineNum = 2;
-    parse(&p->children[0], temp1);
-    parse(&p->children[1], temp2);
-  }else{
-    printf("Invalid entry at table\n");
-    return;
+    if(piku->terminal == 1)
+    {
+
+      printf("inside nonterminal case\n");
+      int rowid = parseIdStr(piku -> term);
+      printf(" row id = %d\n",rowid);
+
+      int grammarno = ( table[rowid][columnid]);
+      printf("grammar no = %d\n\n",grammarno);
+          if(grammarno >= 0 )
+          {
+                printf("grammar no is greater than 0\n");
+                unit * gru = grammararray[grammarno];
+                unit * gram = gru;
+                unit * gram1 = gru;
+                unit * gggg = gru;
+                pop();
+                printf("reversepush grno %u for %s\n",grammarno,grammararray[grammarno]->next->term);
+                reversepush(gru->next);
+                printf("after reverse push \n");
+                printf("*****************\n");
+                display();
+
+                printf("\n\n");
+                int child = 0;
+                while(gram->next!=NULL)
+                {
+                  child++;
+                  gram = gram->next;
+                }
+
+                p->noOfChildren = child;
+                printf("p->child  = %d\n",p->noOfChildren);
+                p->children = (parseTree *)malloc(p->noOfChildren * sizeof(parseTree));
+                int count = 0;
+
+                while(gru ->next != NULL)
+                {     printf("%s \n",gru->next->term);
+                      unit* temp1 = gru->next;
+                      if(temp1->terminal == 0)
+                      {
+                        printf("hi terminal\n");
+                        p->children[count].isTerminal = 0;
+                        p->children[count].terminal.tokenName = temp1->term;
+                        //->children[count].noOfChildren = 0;     //change done..
+                      }
+                     else
+                      {
+                        printf("hi non terminal\n");
+                        p->children[count].isTerminal = 1;
+                        p->children[count].nonTerminal = parseIdStr(temp1->term);
+                      }
+                       gru = gru ->next;
+                       count++;
+                  }
+
+                  for(int j = 0; j < p->noOfChildren; j++)
+                  {
+                      printf("me bhi baccha\n");
+                      parse(fg, &p->children[j]);
+
+                      if(errorflag == 1 || (strcmp(temp->tokenName,"EOF")==0 ))
+                      {
+                        return;
+                      }
+
+                      printf("just returned from j=%u_____________%s\n",j,temp->tokenName);
+
+                  }
+            }
+            else
+            {
+             printf("Invalid entry at table\n");
+             errorflag =1;
+             return;
+            }
+      }
+      else
+      {
+            printf("ham terminal bhi hai\n");
+            if(strcmp(p->terminal.tokenName,"eps")==0)
+            {
+                pop();
+                printf("after reaching eps node\n");
+                printf("*****************\n");
+                display();
+                printf(".....\n");
+                return;
+            }
+            if(strcmp(temp->tokenName ,"EOF")==0)
+            {
+              return;
+            }
+            else if(strcmp(piku->term , temp->tokenName)!=0)
+            {
+              printf("error\n");
+              errorflag = 1;
+              return ;
+            }
+            else
+            {
+              p->terminal.lineNum = temp->lineNum;
+              pop();
+              printf("*****************\n");
+              display();
+              printf("fod denge\n");
+              printf("line no = %d\n",p->terminal.lineNum);
+              temp = getnexttoken(fg,temp);
+              return;
+            }
+        }
+}
+
+
+void printParseTree(parseTree *p , FILE * fip)
+{
+  //printf("%d",p->noOfChildren);
+
+  int chill = p->noOfChildren;
+
+  if(chill > 0)
+  {
+    printParseTree(&p->children[0],fip);
+
+    printf("Non terminal hai\n");
+    fprintf(fip,"non terminal hai\n");
+
+
+    for(int j=1; j < chill; j++)
+    printParseTree(&p->children[j],fip);
+
   }
-}
-else{
-  printf("ham terminal bhi hai\n");
-  if(temp->tokenName == "EOF"){
-    return;
-  }else if(piku->term != temp->tokenName){
-    printf("error");
-  }else{
-    p->terminal.lineNum = temp->lineNum;
-    pop();
-    printf("fod denge\n");
-    printf("line no = %d\n",p->terminal.lineNum);
-    return;
+  else
+  {
+    printf("terminal hai\n");
+    fprintf(fip,"terminal hai\n");
   }
+
 }
-}
 
-// void printParseTree(parseTree *p)
-// {
-//     //printf("%d",p->noOfChildren);
-//     int chill = p->noOfChildren;
-//
-//     if(chill > 0)
-//     {
-//         printParseTree(&p->children[0]);
-//
-//         printf("Non terminal hai\n");
-//
-//         for(int j=1; j < chill; j++)
-//         printParseTree(&p->children[j]);
-//     }
-//     else
-//     {
-//         printf("terminal hai\n");
-//     }
-//
-//
-//
-// }
+int main()
+{
+    getgrammar();
+    createfirst();
+    createfollow();
+    createParseTable();
+    createHASH();
 
-
-
-
-int main(){
-   //getgrammar();
-   // createfirst();
-   // createfollow();
-   // createParseTable();
-   createHASH();
-  	FILE* fg = fopen("t1.txt","r");
-  	tokenInfo* temp1 = (tokenInfo*)calloc(1,sizeof(struct symbols));
-  	do {
-  		temp1 = getnexttoken(fg);
-  		printToken(temp1);
-  	} while(temp1 -> tokenName != "EOF");
-
-    // createHASH();
-    // FILE* fp = fopen("t1.txt","r");
-    // push("dollar",0);
-    // push("program",1);
-    // display();
-    // printf("\n");
-    // tokenInfo* temp1 = (tokenInfo*)malloc(sizeof(struct symbols));
-    //
-    // do {
-    //  temp1 = getnexttoken(fp);
-    //  //printf("%s \n",temp1->tokenName);
-    //  parse( &p , temp1);
-    //  display();
-    // } while(temp1 -> tokenName != "EOF");
-// for(int i=0;i<2;i++)
-//  for(int j=0;j<7;j++)
-//      table[i][j] = -1;
-
-        // temp1->tokenName = "modules";
-        // temp1->lineNum = 1;
-        // parse( &p , temp1);
-        // printf("\nme hoon na \n");
-
-        // temp1->tokenName = "othermodules";
-        // parse( &p , temp1);
-        // printf("me hoon na \n");
-        // display();
-
-        //printParseTree(&p );
-
-
+    FILE* fg = fopen("t1.txt","r");
+    push("$",0);
+    push("program",1);
+    display();
+    printf("me hoon sanyam\n");
+    temp = (tokenInfo*)calloc(1,sizeof(struct symbols));
+    temp = getnexttoken(fg,temp);
+    parse(fg, &p);
+    printf("\n complete\n\n");
+    printf("\n");
+    //showfirst();
+    // unit * san = grammararray[17];
+    // //printf("%s",grammararray[17]->next->term);
+    // while(san!= NULL)
+    // {
+    //   printf("%s \n",san->term);
+    //    san = san->next;
+    // }
 
 }
