@@ -5,7 +5,7 @@ declare module compute;
 start
 	declare var_1_, var_2_, var_3_:integer;
 	declare R1_abc: boolean;
-	declare r2_ABC: integer;
+	declare r2_ABC: integer; := ;
 	declare R3_abc: real;
 	get_value(var_1_);
 	var_2_:=10;

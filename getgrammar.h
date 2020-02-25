@@ -8,8 +8,8 @@ typedef struct unit {
     int terminal;
 } unit;
 
-char buffer[MAX_BUFFER_SIZE]; // the input buffer
-int bufferPosition; // indicates the current character to be read from the buffer
+char buffer[MAX_BUFFER_SIZE];
+int bufferPosition;
 int isNT = 0;
 int bufferSize = -1;
 int arraySize = 50;
@@ -17,16 +17,6 @@ int* countarray;
 unit** grammararray;
 unit** firstarray;
 unit** followarray;
-
-// int strcmp(const char *X, const char *Y){
-//   while (*X) {
-//     if (*X != *Y)
-//     break;
-//     X++;
-//     Y++;
-//   }
-// 	return *(const unsigned char*)X - *(const unsigned char*)Y;
-// }
 
 void showfirstfollow (unit *head){
   unit *ptr = head;
