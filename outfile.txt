@@ -1,0 +1,3 @@
+lexemeCurrentNode     lineno              tokenName           valueIfNumber       parentNodeSymbol    isLeafNode          NodeSymbol
+
+SYNTACTIC error
