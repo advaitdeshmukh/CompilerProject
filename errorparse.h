@@ -9,6 +9,7 @@ typedef struct parseTree {
     struct parseTree *parent;
     int noOfChildren;
     int ruleno;
+    int childnum;
 } parseTree;
 
 
@@ -71,7 +72,7 @@ char *idRepr(int id) {
             if(id == iterativeStmt) return "iterativeStmt";
        if(id == range_arrays) return "range_arrays";
        if(id == range) return "range";
-       return "unknown";
+       return "root";
 }
 
 parseTree p,ast;
@@ -143,14 +144,14 @@ void reversepush(struct unit* head){
 void parse( FILE *fg, parseTree *p )
 {
     if(strcmp(temp->tokenName,"EOF")==0)
-    {   printf("hiloigfngjf\n");
+    {   //printf("hiloigfngjf\n");
         temp->tokenName = "$";
     }
-    printf("token name %s  \n",temp->tokenName);
+    //printf("token name %s  \n",temp->tokenName);
     int columnid = parseIdStr(temp->tokenName);
 
     unit * piku = peek();
-    printf("peek == %s  \n",piku->term);
+    //printf("peek == %s  \n",piku->term);
     if(strcmp(piku->term,"$")==0)
     {
         return;
@@ -162,7 +163,7 @@ void parse( FILE *fg, parseTree *p )
       int grammarno =  table[rowid][columnid];
 
 
-      printf("****grammar no =  %d   rowid = %d  columnid = %d\n",grammarno, rowid, columnid);
+      //printf("****grammar no =  %d   rowid = %d  columnid = %d\n",grammarno, rowid, columnid);
           if(grammarno >= 0 )
           {     //printf("fod diya\n");
                 unit * gru = grammararray[grammarno];
@@ -171,7 +172,7 @@ void parse( FILE *fg, parseTree *p )
                 unit * gggg = gru;
                 pop();
                 reversepush(gru->next);
-                display();
+                //display();
 
                 int child = 0;
                 while(gram->next!=NULL)
@@ -195,7 +196,9 @@ void parse( FILE *fg, parseTree *p )
                         p->children[count].terminal.tokenName = temp1->term;
                         p->children[count].noOfChildren = 0;
                         p->children[count].ruleno = -1;
-                        p->children[count].parent = p;     //change done..
+                        p->children[count].parent = p;
+                        p->children[count].childnum = count;
+                        //printf("!!!! %d\n",count);     //change done..
                       }
                      else
                       {
@@ -204,6 +207,8 @@ void parse( FILE *fg, parseTree *p )
                         p->children[count].noOfChildren = 0;
                         p->children[count].ruleno = -1;
                         p->children[count].parent = p;
+                        p->children[count].childnum = count;
+                        //printf("!!!! %d\n",count);
                       }
                        gru = gru ->next;
                        count++;
@@ -275,7 +280,7 @@ void parse( FILE *fg, parseTree *p )
             if(strcmp(p->terminal.tokenName,"eps")==0)
             {
                 pop();
-                display();
+                //display();
                 return;
             }
             if(strcmp(temp->tokenName ,"EOF")==0)
@@ -308,9 +313,9 @@ void parse( FILE *fg, parseTree *p )
               p->terminal.lineNum = temp->lineNum;
               strcpy(p->terminal.lexeme ,temp->lexeme);
               p->terminal.tokenName = temp->tokenName;
-              printf("sanyam fuck it.\n");
+              //printf("sanyam fuck it.\n");
               pop();
-              display();
+              //display();
               temp = getnexttoken(fg,temp);
               //if(strcmp(temp->tokenName,"EOF")==0)
               //{
@@ -377,10 +382,12 @@ void printastree(parseTree *pt )
 {if(pt == NULL)
   {
       printf("\nTree is empty\n");
+      return;
   }
   if(errorflag ==1)
   {
     printf("SYNTACTIC error\n");
+    return;
   }
   else
   {
@@ -389,10 +396,10 @@ void printastree(parseTree *pt )
 
     if(chill > 0)
     {
-        printf("NO NT ---        ");
+        printf("NO NT1 ---        ");
         printf("rulenp = %d               ",pt->ruleno);
         printf("*** %s           ",idRepr(pt->parent->nonTerminal));
-        printf("*** %d           ",pt->parent->isTerminal);
+        printf("baap === %d           ",pt->parent->isTerminal);
         printf("%s \n",idRepr(pt->nonTerminal));
 
 
@@ -415,26 +422,26 @@ void printastree(parseTree *pt )
         printf("YES Ter ***  " );
         printf("ruleno = %d               ",pt->ruleno);
         printf("*** %s           ",idRepr(pt->parent->nonTerminal));
-        printf("*** %d           ",pt->parent->isTerminal);
+        printf("baap=== %d           ",pt->parent->isTerminal);
         printf("lexeme = %s      ",pt->terminal.lexeme);
         printf(" lnno = %d       ",pt->terminal.lineNum);
         printf("---\n");
       }
       else
      {
-        printf("NO NT --- ");
+        printf("NO NT ---             ");
         printf("%s         ",idRepr(pt->nonTerminal));
-        printf("rulenp = %d               ",pt->ruleno);
+        printf("rulens = %d               ",pt->ruleno);
         printf("*** %s           ",idRepr(pt->parent->nonTerminal));
-        printf("*** %d           ",pt->parent->isTerminal);
-        printf("%s \n",idRepr(pt->nonTerminal));
+        printf("baap=== %d           ",pt->parent->isTerminal);
+        printf("%s",idRepr(pt->nonTerminal));
+        printf("nofchildren == %d \n",pt->noOfChildren);
+
         }
     }
 
 }
 }
-
-
 
 int isUseful(char * idStr) {
     if(strcmp(idStr, "PRINT") == 0) return 1;
@@ -467,7 +474,7 @@ int isUseful(char * idStr) {
 
 void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
 {
-    printf("hi ast function\n");
+    //printf("hi ast function\n");
     int i, j, usefulChildrenCount = 0;
 
     for(i = 0; i < p->noOfChildren; i++)
@@ -477,7 +484,7 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
 
     ast->noOfChildren = usefulChildrenCount;
     ast->ruleno = p->ruleno;
-    printf("children = %d\n\n",usefulChildrenCount);
+    //printf("children = %d\n\n",usefulChildrenCount);
     ast->children = (parseTree *)malloc(ast->noOfChildren * sizeof(parseTree));
     ast->parent = p->parent;
 
@@ -486,23 +493,24 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
         if(p->children[i].isTerminal == 0) {
             if(isUseful(p->children[i].terminal.tokenName)) {
                 // copy ith node of p to jth node of ast
-                printf("TT === i = %d  j = %d \n",i,j);
+                //printf("TT === i = %d  j = %d \n",i,j);
                 ast->children[j].isTerminal = 0;
                 //printf("tt = %s \n",p->children[i].terminal.tokenName);
                 ast->children[j].terminal.tokenName = p->children[i].terminal.tokenName;
-                printf("tt = %s \n",ast->children[j].terminal.tokenName);
+                //printf("tt = %s \n",ast->children[j].terminal.tokenName);
                 strcpy(ast->children[j].terminal.lexeme, p->children[i].terminal.lexeme);
                 ast->children[j].terminal.lineNum = p->children[i].terminal.lineNum;
                 ast->children[j].ruleno = p->children[i].ruleno;
                 ast->children[j].noOfChildren = 0;
                 ast->children[j].parent = p->children[i].parent;
+                ast->children[j].childnum = j;
                 //printf("\n $$$$$  %s $$$$\n",ast->children[j].children.nonTerminal);
                 j++;
             }
         }
         else {
             // recursively construct the ast rooted here
-            printf("NT === i = %d  j = %d \n",i,j);
+            //printf("NT === i = %d  j = %d \n",i,j);
             //printf("\n\nlast statement then do it\n");
             if(p->children[i].noOfChildren > 0)
             {
@@ -511,6 +519,7 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
                 ast->children[j].ruleno = p->children[i].ruleno;
                 ast->children[j].noOfChildren = 0;
                 ast->children[j].parent = p->children[i].parent;
+                ast->children[j].childnum = j;
                 //printf("nntt = %s\n",idRepr(ast->children[j].nonTerminal));
                 createAbstractSyntaxTree(&p->children[i], &ast->children[j]);
                 j++;

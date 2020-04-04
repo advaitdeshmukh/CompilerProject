@@ -19,6 +19,35 @@ size_t strlen(char *p)
     return count;
 }
 
+char* strcat(char *str1, char *str2) {
+
+   size_t i, len_str1 = 0, len_str2 = 0, len_str3;
+   char* str3;
+
+   for (i = 0; str1[i] !='\0'; i++) {
+      len_str1++;
+   }
+
+   for (i = 0; str2[i] != '\0'; i++) {
+      len_str2++;
+   }
+
+   len_str3 = len_str1 + len_str2;
+   str3 = malloc(len_str3 + 1);
+
+   for (i = 0; i < len_str1; i++) {
+      str3[i] = str1[i];
+   }
+
+   for (i = 0; i < len_str2; i++) {
+      str3[i + len_str1] = str2[i];
+   }
+
+   str3[len_str3] = '\0'; // Null terminate the string
+
+   return str3;
+}
+
 struct functionNode{
     char name[30];
     char input[100];
