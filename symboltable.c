@@ -34,11 +34,11 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
 
   if(ast->isTerminal == 0 && (ast->parent)){
     if ((strcmp(idRepr(ast->parent->nonTerminal),"module")==0) && strcmp(funcname,ast->terminal.lexeme)==0){
-      parseTree ipList = ast->parent->children[7];
+      parseTree ipList = ast->parent->children[1];
       char inputtype[1000] = {'\0'};
       char outputtype[1000] = {'\0'};
 
-      switch(ipList.children[2].ruleno){
+      switch(ipList.children[1].ruleno){
         case 17:
           strcat(inputtype,"INTEGER");
           break;
@@ -52,13 +52,13 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
           break;
 
         case 20:{
-          parseTree range = ipList.children[2].children[2];
+          parseTree range = ipList.children[1].children[1];
           int num1 = atoi(range.children[0].children[0].terminal.lexeme);
-          int num2 = atoi(range.children[2].children[0].terminal.lexeme);
+          int num2 = atoi(range.children[1].children[0].terminal.lexeme);
           int r = num2 - num1 +1;
           char size[3];
           char type[100] = {'\0'};
-          switch(ipList.children[2].children[5].ruleno){
+          switch(ipList.children[1].children[2].ruleno){
             case 21:
               strcat(inputtype,"ARRAY(INTEGER, ");
               strcat(inputtype,size);
@@ -66,10 +66,8 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
               break;
 
             case 22:
-            printf("arererere\n");
-
               strcat(inputtype,"ARRAY(REAL, ");
-              strcat(inputtype,"5");
+              strcat(inputtype,size);
               strcat(inputtype,")");
               break;
 
@@ -83,10 +81,9 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
         }
       }
 
-      parseTree N1 = ipList.children[3];
-
-      while(N1.ruleno != 13){
-        switch(N1.children[3].ruleno){
+      parseTree N1 = ipList.children[2];
+       while(N1.ruleno != 13){
+         switch(N1.children[1].ruleno){
           case 17:
             strcat(inputtype,"; INTEGER");
             break;
@@ -127,14 +124,14 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
             }
             break;
           }
-        }
+         }
 
-        N1 = N1.children[4];
+        N1 = N1.children[2];
       }
 
-      if(ast->parent->children[10].ruleno != 10){
-        parseTree opList = ast->parent->children[10].children[2];
-        switch(opList.children[2].ruleno){
+      if(ast->parent->children[2].ruleno != 10){
+        parseTree opList = ast->parent->children[2].children[0];
+        switch(opList.children[1].ruleno){
           case 21:
           strcat(outputtype, "INTEGER");
           break;
@@ -148,10 +145,9 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
           break;
         }
 
-        parseTree N2 = opList.children[3];
-
+        parseTree N2 = opList.children[2];
         while(N2.ruleno!=16){
-          switch(N2.children[3].ruleno){
+          switch(N2.children[1].ruleno){
             case 21:
               strcat(outputtype, "; INTEGER");
               break;
@@ -164,14 +160,13 @@ void populateFunctionDefinitions(char* funcname, parseTree* ast){
               strcat(outputtype, "; BOOLEAN");
               break;
           }
-          N2 = N2.children[4];
+          N2 = N2.children[2];
         }
       }
 
-      printf("I am %s %s %s\n",funcname,inputtype,outputtype);
+      //printf("I am %s %s %s\n",funcname,inputtype,outputtype);
       hash_insert_func(funcname,inputtype, outputtype);
       return;
-
     }
   }
 
@@ -193,7 +188,7 @@ void main()
     createHASH();
     createsymboltable();
 
-    FILE* fg = fopen("t5.txt","r");
+    FILE* fg = fopen("t4.txt","r");
     push("$",0);
     push("program",1);
     display();
@@ -206,7 +201,7 @@ void main()
     parse(fg, &p);
     printf("complete parsing \n");
     //printparseTree(&p);
-   printf("\ncomplete printing parse tree\n");
+    printf("\ncomplete printing parse tree\n");
 
     ast.isTerminal = 0;
     ast.nonTerminal = parseIdStr("program");
@@ -217,7 +212,7 @@ void main()
     printastree(&ast);
     printf("\ncomplete ast\n");
     //printf("-----------------------------\n%s\n",ast);
-    populateFunctionDefinitions("readArr",&ast);
+    populateFunctionDefinitions("compute",&ast);
     //hash_insert_func("global","INT,INT","INT");
     //func_display();
 }

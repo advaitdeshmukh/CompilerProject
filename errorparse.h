@@ -486,7 +486,7 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
     ast->ruleno = p->ruleno;
     //printf("children = %d\n\n",usefulChildrenCount);
     ast->children = (parseTree *)malloc(ast->noOfChildren * sizeof(parseTree));
-    ast->parent = p->parent;
+    //ast->parent = p->parent;
 
     i = 0, j = 0;
     while(i < p->noOfChildren) {
@@ -502,7 +502,7 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
                 ast->children[j].terminal.lineNum = p->children[i].terminal.lineNum;
                 ast->children[j].ruleno = p->children[i].ruleno;
                 ast->children[j].noOfChildren = 0;
-                ast->children[j].parent = p->children[i].parent;
+                ast->children[j].parent = ast;
                 ast->children[j].childnum = j;
                 //printf("\n $$$$$  %s $$$$\n",ast->children[j].children.nonTerminal);
                 j++;
@@ -518,7 +518,7 @@ void createAbstractSyntaxTree(parseTree *p, parseTree *ast)
                 ast->children[j].isTerminal = 1;
                 ast->children[j].ruleno = p->children[i].ruleno;
                 ast->children[j].noOfChildren = 0;
-                ast->children[j].parent = p->children[i].parent;
+                ast->children[j].parent = ast;
                 ast->children[j].childnum = j;
                 //printf("nntt = %s\n",idRepr(ast->children[j].nonTerminal));
                 createAbstractSyntaxTree(&p->children[i], &ast->children[j]);
